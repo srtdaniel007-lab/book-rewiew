@@ -5,20 +5,20 @@ import BookCard from './components/BookCard';
 import BookDetailModal from './components/BookDetailModal';
 import MyShelves from './components/MyShelves';
 import AuthModal from './components/AuthModal';
-import DatabaseViewerModal from './components/DatabaseViewerModal';
+import LiteraryQuote from './components/LiteraryQuote';
 import { api } from './api';
 import { useAuth } from './context/AuthContext';
 
 const QUICK_TOPICS = [
   'Bestsellers',
   'Fiction',
+  'Classic Literature',
+  'Philosophy',
   'Science Fiction',
   'Psychology',
-  'Self-Help',
+  'Poetry',
   'Mystery',
-  'Philosophy',
-  'Fantasy',
-  'Technology'
+  'Fantasy'
 ];
 
 export default function App() {
@@ -36,14 +36,13 @@ export default function App() {
   const [selectedBook, setSelectedBook] = useState(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login');
-  const [dbModalOpen, setDbModalOpen] = useState(false);
 
   // Initial load
   useEffect(() => {
     handleSearch('bestseller books');
   }, []);
 
-  // Sync shelves when user logs in/out
+  // Sync shelves live from PostgreSQL whenever user signs in or out
   useEffect(() => {
     if (user) {
       loadUserShelves();
@@ -61,7 +60,7 @@ export default function App() {
       });
       setShelvesMap(map);
     } catch (e) {
-      console.error('Failed to load shelves map', e);
+      console.error('Failed to load shelves map from PostgreSQL', e);
     }
   };
 
@@ -104,7 +103,6 @@ export default function App() {
         activeTab={activeNav}
         setActiveTab={setActiveNav}
         onOpenAuth={openAuth}
-        onOpenDbModal={() => setDbModalOpen(true)}
       />
 
       <main className="container" style={{ flex: 1, paddingTop: '20px' }}>
@@ -112,15 +110,18 @@ export default function App() {
           <div>
             {/* Hero / Search Section */}
             <section className="hero-banner">
-              <div className="hero-pill">
-                <Sparkles size={14} /> Open Book Discovery & Reviews
+              {/* Random Literary Quote Banner */}
+              <LiteraryQuote />
+
+              <div className="hero-pill" style={{ background: '#fef3c7', color: '#b45309' }}>
+                <Sparkles size={14} /> The Literary Sanctuary
               </div>
-              <h1 className="hero-heading">
-                Read, Track & <span>Review Books</span>
+              <h1 className="hero-heading" style={{ fontFamily: 'var(--font-serif)', fontSize: '3.2rem', letterSpacing: '-0.02em' }}>
+                THE MUSE'S <span style={{ color: '#b45309', fontStyle: 'italic' }}>SHELF</span>
               </h1>
               <p className="hero-subtitle">
-                A Goodreads clone powered by free open-source APIs & PostgreSQL.
-                Search thousands of books, label them to your shelf, rate & publish your reviews.
+                Explore thousands of books, catalog your personal reading journey, rate your reads, 
+                and preserve your written reviews safely in your library.
               </p>
 
               {/* Dynamic Search Box */}
@@ -132,14 +133,14 @@ export default function App() {
                   }}
                   className="search-input-box"
                 >
-                  <Search size={22} color="#6366f1" style={{ marginLeft: '6px' }} />
+                  <Search size={22} color="#b45309" style={{ marginLeft: '6px' }} />
                   <input
                     type="text"
-                    placeholder="Search by title, author, topic, or ISBN..."
+                    placeholder="Search by title, author, topic, or keyword..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
-                  <button type="submit" className="search-submit-btn">
+                  <button type="submit" className="search-submit-btn" style={{ background: '#b45309' }}>
                     <span>Search</span>
                   </button>
                 </form>
@@ -167,10 +168,10 @@ export default function App() {
             <div className="section-header">
               <div>
                 <h2 className="section-title">
-                  {searchQuery ? `Results for "${searchQuery}"` : 'Recommended & Trending Books'}
+                  {searchQuery ? `Results for "${searchQuery}"` : 'Curated & Trending Reads'}
                 </h2>
                 <p style={{ color: '#64748b', fontSize: '0.9rem' }}>
-                  Click any book to shelf as "Want to Read", "Reading", or "Read", and write reviews.
+                  Click any book to shelf under "Want to Read", "Reading", or "Read", and pen your review.
                 </p>
               </div>
             </div>
@@ -183,12 +184,12 @@ export default function App() {
 
             {/* Books Grid */}
             {loading ? (
-              <div style={{ textAlign: 'center', padding: '80px 20px', color: '#6366f1' }}>
-                <div style={{ fontSize: '1.2rem', fontWeight: 600 }}>Fetching books from Open Library & Google Books API...</div>
+              <div style={{ textAlign: 'center', padding: '80px 20px', color: '#b45309' }}>
+                <div style={{ fontSize: '1.2rem', fontWeight: 600 }}>Gathering books from Open Literary Sources...</div>
               </div>
             ) : books.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '60px 20px', color: '#94a3b8' }}>
-                No books found. Try another search query!
+                No books found. Try searching for a different title or author!
               </div>
             ) : (
               <div className="books-grid">
@@ -215,12 +216,12 @@ export default function App() {
       <footer style={{ borderTop: '1px solid #e2e8f0', background: '#ffffff', padding: '28px 0', marginTop: 'auto' }}>
         <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px', fontSize: '0.88rem', color: '#64748b' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <BookOpen size={18} color="#4f46e5" />
-            <span style={{ fontWeight: 700, color: '#1e293b' }}>BookReads</span>
-            <span>— Open Source Book Review & Shelving Platform</span>
+            <BookOpen size={18} color="#b45309" />
+            <span style={{ fontWeight: 700, color: '#1e293b' }}>The Muse's Shelf</span>
+            <span>— Your personal digital sanctuary for books & reviews</span>
           </div>
-          <div>
-            FastAPI • PostgreSQL • React • Bcrypt Auth
+          <div style={{ color: '#94a3b8' }}>
+            FastAPI • PostgreSQL • React
           </div>
         </div>
       </footer>
@@ -242,13 +243,6 @@ export default function App() {
         initialMode={authMode}
         onClose={() => setAuthModalOpen(false)}
       />
-
-      {/* Live PostgreSQL Database Viewer Modal */}
-      <DatabaseViewerModal
-        isOpen={dbModalOpen}
-        onClose={() => setDbModalOpen(false)}
-      />
     </div>
   );
 }
-
