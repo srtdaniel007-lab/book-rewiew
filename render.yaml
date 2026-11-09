@@ -20,11 +20,16 @@ services:
   - type: web
     name: bookreads-frontend
     runtime: static
-    region: oregon
     plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: bookreads-backend
+          property: host
     routes:
       - type: rewrite
         source: /*

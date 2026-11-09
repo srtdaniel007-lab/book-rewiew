@@ -1,6 +1,11 @@
-// In production on Render, VITE_API_URL can be set to the backend service URL (e.g. https://your-backend.onrender.com)
+// In production on Render, VITE_API_URL can be set to the backend service URL or host
 // In local development, it defaults to empty string so it uses the Vite proxy (/api)
-const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '') + '/api';
+let baseApiUrl = (import.meta.env.VITE_API_URL || '').trim().replace(/\/$/, '');
+if (baseApiUrl && !baseApiUrl.startsWith('http://') && !baseApiUrl.startsWith('https://')) {
+  baseApiUrl = `https://${baseApiUrl}`;
+}
+const API_BASE = baseApiUrl ? `${baseApiUrl}/api` : '/api';
+
 
 
 // Helper for sending authenticated requests
