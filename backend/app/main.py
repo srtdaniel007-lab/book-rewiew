@@ -13,14 +13,15 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Configure CORS for React frontend (dynamically configured via .env CORS_ORIGINS)
+# Configure CORS for React frontend (completely open for Bearer token auth)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins_list,
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 
 # Register API Routers
