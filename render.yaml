@@ -3,14 +3,14 @@ services:
   - type: web
     name: bookreads-backend
     runtime: python
-    region: oregon
+    region: ohio
     plan: free
     rootDir: backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DATABASE_URL
-        sync: false
+        value: postgresql://book_review_6wby_user:UDQ7Qd4GJjeFHiiCiSrpDmgG3wmcOtcN@dpg-dbokdi1srm7s73c8ij00-a.ohio-postgres.render.com/book_review_6wby
       - key: JWT_SECRET
         generateValue: true
       - key: ENVIRONMENT
